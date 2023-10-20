@@ -74,15 +74,17 @@ int main(int argc, char *argv[]){
 }
 
 bool s_option(char *buffer, bool *is_last_empty) {
+    bool res = false;
     if (*is_last_empty == true && strlen(buffer) == 1 && buffer[0] == '\n'){
         buffer[0] = '\0';
-        return true;
+        res = true;
     } else if(strlen(buffer) == 1 && buffer[0] == '\n'){
         *is_last_empty = true;
-        return false;
+        res = false;
+    } else{
+        *is_last_empty = false;
     }
-    *is_last_empty = false;
-    return false;
+    return res;
 }
 
 void b_option(const char *buffer, int i, int *pInt) {
