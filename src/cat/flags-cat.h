@@ -11,12 +11,12 @@ typedef struct flags_cat{
     bool s;
     bool t;
 }flags_cat;
-void init_flags(struct flags_cat flags){
-    flags.b = false;
-    flags.e = false;
-    flags.n = false;
-    flags.s = false;
-    flags.t = false;
+void init_flags(struct flags_cat *flags){
+    (*flags).b = false;
+    (*flags).e = false;
+    (*flags).n = false;
+    (*flags).s = false;
+    (*flags).t = false;
 };
 #endif
 
