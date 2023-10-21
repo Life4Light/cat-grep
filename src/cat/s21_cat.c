@@ -6,7 +6,7 @@
 
 int main(int argc, char *argv[]) {
 	struct flags_cat flags;
-	char **filenames;
+	char file_name[256];
 	init_flags(&flags);
 	char buffer[256];
 	int rez;
@@ -35,13 +35,11 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	files_count = argc - optind;
-	filenames = (char **) malloc(files_count * sizeof(int *));
-	for (int i = 0; i < files_count; i++){
-		filenames[i] = (int *) malloc(255 * sizeof(int));
+	for (int file_counter = 0; file_counter < files_count; file_counter++){
 		int counter_n_option = 1;
 		int counter_b_option = 1;
-		strcpy(filenames[i], argv[optind + i]);
-		FILE *fp = fopen(filenames[i], "r");
+		strcpy(file_name, argv[optind + file_counter]);
+		FILE *fp = fopen(file_name, "r");
 		if(!fp){
 			printf("file not correct");
 			return 1;
@@ -73,11 +71,6 @@ int main(int argc, char *argv[]) {
 		}
 		fclose(fp);
 	}
-	for (int i = 0; i < files_count; i++)
-		free(filenames[i]);
-
-	free(filenames);
-
 }
 
 
