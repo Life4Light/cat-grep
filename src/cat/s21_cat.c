@@ -75,3 +75,45 @@ int main(int argc, char *argv[]) {
 
 
 
+bool s_option(char *buffer, bool *is_last_empty) {
+    bool res = false;
+    if (*is_last_empty == true && strlen(buffer) == 1 && buffer[0] == '\n'){
+        buffer[0] = '\0';
+        res = true;
+    } else if(strlen(buffer) == 1 && buffer[0] == '\n'){
+        *is_last_empty = true;
+        res = false;
+    } else{
+        *is_last_empty = false;
+    }
+    return res;
+}
+
+void b_option(const char *buffer, int i, int *pInt) {
+    if(i == 0 && buffer[i] != '\n' && buffer[0] != '\0'){
+        printf("%d\t", *pInt);
+        *pInt = *pInt + 1;
+    } else if(i == 0 && buffer[0] != '\0'){
+        printf("\t");
+    }
+}
+
+void n_option(const char *buffer, int buffer_index, int *number) {
+    if(buffer_index == 0 && buffer[0] != '\0'){
+        printf("%d\t", *number);
+        *number = *number + 1;
+    }
+}
+
+void t_option(char *string) {
+    if(string[0] == '\t'){
+        printf("^");
+        string[0] = 'I';
+    }
+}
+
+void e_option(const char *str){
+    if(str[0] == '\n'){
+        printf("$");
+    }
+}
