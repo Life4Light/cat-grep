@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <ctype.h>
+#include <getopt.h>
 
 typedef struct flags_cat{
 	bool b;
@@ -17,8 +18,14 @@ typedef struct flags_cat{
 	bool n;
 	bool s;
 	bool t;
+	bool E;
+	bool T;
 }flags_cat;
+
+
 void init_flags(struct flags_cat *flags);
+
+void init_long_options(struct option *long_options);
 
 void e_option(const char *str);
 
@@ -30,10 +37,17 @@ void b_option(const char *buffer, int i, int *pInt);
 
 bool s_option(char *buffer, bool *is_last_empty);
 
-void v_option(const char ch);
+void v_option(char ch);
 
+void get_flags(int argc, char *argv[], struct flags_cat *flags, struct option *options);
 
+void gnu_t_option(char *string);
 
+void gnu_e_option(const char *string);
+
+int cat(int files_count, char *argv[], struct flags_cat flags);
+
+void print_result(flags_cat flags, char *buffer);
 
 #endif
 
