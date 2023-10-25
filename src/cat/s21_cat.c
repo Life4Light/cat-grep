@@ -32,7 +32,7 @@ void cat(int files_count, char *argv[], struct flags_cat flags){
 		{
 			print_result(flags, buffer, &counter_n_option, &counter_b_option);
 		}
-		printf("\n");
+		putchar('\n');
 		fclose(fp);
 	}
 }
@@ -51,13 +51,14 @@ void print_result(flags_cat flags, char *buffer, int *counter_n_option, int *cou
 		if(flags.b == true){
 			b_option(buffer, i, counter_b_option);
 		}
-		if(flags.e == true) {
-			v_option(buffer[i]);
-			e_option(&buffer[i]);
-		}
-		if(flags.t == true) {
-			v_option(buffer[i]);
-			t_option(&buffer[i]);
+		if(flags.e == true || flags.t == true){
+			if(flags.e == true && buffer[i] == '\n'){
+				e_option(&buffer[i]);
+			} else if(flags.t == true && buffer[i] == '\t'){
+				t_option(&buffer[i]);
+			} else{
+				v_option(buffer[i]);
+			}
 		}
 		if(flags.E == true) {
 			e_option(&buffer[i]);
@@ -66,7 +67,7 @@ void print_result(flags_cat flags, char *buffer, int *counter_n_option, int *cou
 			t_option(&buffer[i]);
 		}
 		if(connect_empty_lines == false && (!iscntrl(buffer[i]) || buffer[i] == '\n')){
-			printf("%c", buffer[i]);
+			putchar(buffer[i]);
 		}
 	}
 }

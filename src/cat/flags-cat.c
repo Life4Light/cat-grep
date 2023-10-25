@@ -59,16 +59,25 @@ void get_flags(int argc, char *argv[], struct flags_cat *flags, struct option *o
 
 void b_option(const char *buffer, int i, int *pInt) {
     if(i == 0 && buffer[i] != '\n' && buffer[0] != '\0'){
-        printf("    %d\t", *pInt);
+		putchar(' ');
+		putchar(' ');
+		putchar(' ');
+		putchar(' ');
+		putchar(*pInt + '0');
         *pInt = *pInt + 1;
     } else if(i == 0 && buffer[0] != '\0'){
-        printf("\t");
+        putchar('\t');
     }
 }
 
 void n_option(const char *buffer, int buffer_index, int *number) {
     if(buffer_index == 0 && buffer[0] != '\0'){
-        printf("    %d\t", *number);
+		putchar(' ');
+		putchar(' ');
+		putchar(' ');
+		putchar(' ');
+		putchar(*number + '0');
+		putchar('\t');
         (*number)++;
     }
 }
@@ -98,20 +107,29 @@ bool s_option(char *buffer, bool *is_last_empty) {
 }
 
 void v_option(const char ch){
-    if((ch<32 || ch ==127) && ch!= '\n' && ch != '\t'){
-        printf("^%c", ch+64);
+	if(!isascii(ch) && !isprint(ch)){
+		putchar('M');
+		putchar('-');
+		toascii(ch);
+	}
+    if((ch<32) && ch!= '\n' && ch != '\t'){
+		putchar('^');
+        putchar(ch+64);
     }
+	if(ch == 127){
+		putchar('?');
+	}
 }
 
 void gnu_e_option(const char *str){
 	if(str[0] == '\n'){
-		printf("$");
+		putchar('$');
 	}
 }
 
 void gnu_t_option(char *string) {
 	if(string[0] == '\t'){
-		printf("^");
+		putchar('^');
 		string[0] = 'I';
 	}
 }
