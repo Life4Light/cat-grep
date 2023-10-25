@@ -45,9 +45,9 @@ void gnu_t_option(char *string);
 
 void gnu_e_option(const char *string);
 
-int cat(int files_count, char *argv[], struct flags_cat flags);
+void cat(int files_count, char *argv[], struct flags_cat flags);
 
-void print_result(flags_cat flags, char *buffer);
+void print_result(flags_cat flags, char *buffer, int *counter_n_option, int *counter_b_option);
 
 #endif
 

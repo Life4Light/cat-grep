@@ -59,7 +59,7 @@ void get_flags(int argc, char *argv[], struct flags_cat *flags, struct option *o
 
 void b_option(const char *buffer, int i, int *pInt) {
     if(i == 0 && buffer[i] != '\n' && buffer[0] != '\0'){
-        printf("%d\t", *pInt);
+        printf("    %d\t", *pInt);
         *pInt = *pInt + 1;
     } else if(i == 0 && buffer[0] != '\0'){
         printf("\t");
@@ -68,8 +68,8 @@ void b_option(const char *buffer, int i, int *pInt) {
 
 void n_option(const char *buffer, int buffer_index, int *number) {
     if(buffer_index == 0 && buffer[0] != '\0'){
-        printf("%d\t", *number);
-        *number = *number + 1;
+        printf("    %d\t", *number);
+        (*number)++;
     }
 }
 
