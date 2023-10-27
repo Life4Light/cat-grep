@@ -28,11 +28,13 @@ void cat(int files_count, char *argv[], struct flags_cat flags){
 			printf("%s is not correct\n", file_name);
 			continue;
 		}
+		if(i != 0){
+			putchar('\n');
+		}
 		while((fgets(buffer, 256, fp)) != NULL)
 		{
 			print_result(flags, buffer, &counter_n_option, &counter_b_option);
 		}
-		putchar('\n');
 		fclose(fp);
 	}
 }
