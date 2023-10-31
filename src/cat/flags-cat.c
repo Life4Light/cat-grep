@@ -1,6 +1,7 @@
 #include "flags-cat.h"
 void init_flags(struct flags_cat *flags){
     (*flags).b = false;
+	(*flags).v = false;
     (*flags).e = false;
     (*flags).n = false;
     (*flags).s = false;
@@ -27,7 +28,7 @@ void init_long_options(struct option *long_options){
 
 void get_flags(int argc, char *argv[], struct flags_cat *flags, struct option *options){
 	int rez;
-	while ((rez = getopt_long(argc, argv, "benstET", options, NULL)) != -1) {
+	while ((rez = getopt_long(argc, argv, "benstvET", options, NULL)) != -1) {
 		switch (rez) {
 			case 'b':
 				(*flags).b = true;
@@ -44,6 +45,9 @@ void get_flags(int argc, char *argv[], struct flags_cat *flags, struct option *o
 			case 't':
 				(*flags).t = true;
 				break;
+			case 'v':
+				(*flags).v = true;
+				break;
 			case 'E':
 				(*flags).E = true;
 				break;
@@ -59,11 +63,8 @@ void get_flags(int argc, char *argv[], struct flags_cat *flags, struct option *o
 
 void b_option(const char *buffer, int i, int *pInt) {
     if(i == 0 && buffer[i] != '\n' && buffer[0] != '\0'){
-		putchar(' ');
-		putchar(' ');
-		putchar(' ');
-		putchar(' ');
-		putchar(*pInt + '0');
+		printf("%6d", *pInt);
+		putchar('\t');
         *pInt = *pInt + 1;
     } else if(i == 0 && buffer[0] != '\0'){
         putchar('\t');
@@ -76,7 +77,7 @@ void n_option(const char *buffer, int buffer_index, int *number) {
 		putchar(' ');
 		putchar(' ');
 		putchar(' ');
-		putchar(*number + '0');
+		putchar(*number);
 		putchar('\t');
         (*number)++;
     }

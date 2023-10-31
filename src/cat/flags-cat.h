@@ -18,6 +18,7 @@ typedef struct flags_cat{
 	bool n;
 	bool s;
 	bool t;
+	bool v;
 	bool E;
 	bool T;
 }flags_cat;

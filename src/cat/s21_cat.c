@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <malloc.h>
 #include "flags-cat.h"
 
 void print_with_echo();
@@ -15,7 +16,9 @@ int main(int argc, char *argv[]) {
 
 void cat(int files_count, char *argv[], struct flags_cat flags){
 	char file_name[256];
-	char buffer[256];
+	char* buffer = NULL;
+	size_t len = 0;
+	ssize_t read = 0;
 	int counter_n_option = 1;
 	int counter_b_option = 1;
 	if (files_count == 0){
@@ -31,11 +34,13 @@ void cat(int files_count, char *argv[], struct flags_cat flags){
 		if(i != 0){
 			putchar('\n');
 		}
-		while((fgets(buffer, 256, fp)) != NULL)
+		while((read = getline(&buffer, &len, fp)) != -1)
 		{
 			print_result(flags, buffer, &counter_n_option, &counter_b_option);
 		}
 		fclose(fp);
+		if (buffer)
+			free(buffer);
 	}
 }
 
@@ -61,6 +66,9 @@ void print_result(flags_cat flags, char *buffer, int *counter_n_option, int *cou
 			} else{
 				v_option(buffer[i]);
 			}
+		}
+		if(flags.v == true) {
+			v_option(buffer[i]);
 		}
 		if(flags.E == true) {
 			e_option(&buffer[i]);
