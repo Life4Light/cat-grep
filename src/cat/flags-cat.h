@@ -31,7 +31,7 @@ void e_option(char buffer);
 
 void t_option(char *buffer);
 
-void n_option(char buffer, bool is_first, int *number);
+void n_option(bool is_first, int *number);
 
 void b_option(char buffer, bool is_first, int *pInt);
 
@@ -49,6 +49,7 @@ void gnu_e_option(char buffer);
 void cat(int files_count, char *argv[], struct flags_cat flags);
 
 void print_result(flags_cat flags, char buffer, int *counter_n_option,
-                  int *counter_b_option, bool *is_first, bool *last_str_is_empty, bool *connect_empty_lines);
+                  int *counter_b_option, bool *is_first,
+                  bool *last_str_is_empty);
 
 #endif

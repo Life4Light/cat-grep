@@ -66,33 +66,29 @@ void b_option(char buffer, bool is_first, int *pInt) {
   }
 }
 
-void n_option(char buffer, bool is_first, int *number) {
+void n_option(bool is_first, int *number) {
   if (is_first == true) {
     printf("%6d\t", *number);
     (*number)++;
   }
 }
 
-void t_option(char *buffer) {
-  gnu_t_option(buffer);
-}
+void t_option(char *buffer) { gnu_t_option(buffer); }
 
-void e_option(char buffer) {
-  gnu_e_option(buffer);
-}
+void e_option(char buffer) { gnu_e_option(buffer); }
 
 bool s_option(char *buffer, bool *is_last_empty, bool is_first) {
-    bool res = false;
-    if(*buffer == '\n'){
-        if(*is_last_empty && is_first){
-            res = true;
-        } else if(!(*is_last_empty) && is_first){
-            *is_last_empty = true;
-        } else{
-            *is_last_empty = false;
-            res = false;
-        }
+  bool res = false;
+  if (*buffer == '\n') {
+    if (*is_last_empty && is_first) {
+      res = true;
+    } else if (!(*is_last_empty) && is_first) {
+      *is_last_empty = true;
+    } else {
+      *is_last_empty = false;
+      res = false;
     }
+  }
   return res;
 }
 
@@ -101,9 +97,9 @@ void v_option(char ch, bool *print) {
     ch = toascii(ch);
   }
   if (iscntrl(ch) && ch != '\n' && ch != '\t') {
-      putchar('^');
-      putchar(ch == 127 ? '?' : ch + 64);
-      *print = true;
+    putchar('^');
+    putchar(ch == 127 ? '?' : ch + 64);
+    *print = true;
   }
 }
 

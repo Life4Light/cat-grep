@@ -25,9 +25,8 @@ void cat(int files_count, char *argv[], struct flags_cat flags) {
     print_with_echo();
   }
   for (int i = 0; i < files_count; i++) {
-      bool last_str_is_empty = false;
-      bool connect_empty_lines = false;
-      strcpy(file_name, argv[optind + i]);
+    bool last_str_is_empty = false;
+    strcpy(file_name, argv[optind + i]);
     FILE *fp = fopen(file_name, "r");
     if (!fp) {
       printf("%s is not correct\n", file_name);
@@ -42,47 +41,48 @@ void cat(int files_count, char *argv[], struct flags_cat flags) {
         break;
       }
       print_result(flags, buffer, &counter_n_option, &counter_b_option,
-                   &is_first, &last_str_is_empty, &connect_empty_lines);
+                   &is_first, &last_str_is_empty);
     } while (buffer != EOF);
     fclose(fp);
   }
 }
 
 void print_result(flags_cat flags, char buffer, int *counter_n_option,
-                  int *counter_b_option, bool *is_first, bool *last_str_is_empty, bool *connect_empty_lines) {
-    bool print = false;
+                  int *counter_b_option, bool *is_first,
+                  bool *last_str_is_empty) {
+  bool print = false;
   if (flags.s == true) {
     print = s_option(&buffer, last_str_is_empty, *is_first);
   }
-  if(print == false){
-      if (flags.n == true && flags.b == false) {
-          n_option(buffer, *is_first, counter_n_option);
-      }
-      if (flags.b == true) {
-          b_option(buffer, *is_first, counter_b_option);
-      }
-      if (flags.e == true || flags.t == true) {
-          if (flags.e == true && buffer == '\n') {
-              e_option(buffer);
-          } else if (flags.t == true && buffer == '\t') {
-              t_option(&buffer);
-          } else if(flags.e == true || flags.t == true){
-              if(buffer != '\n' && buffer != '\t'){
-                  v_option(buffer, &print);
-              }
-          }
-      }
-      if (flags.v == true && (flags.e == false || flags.t == false) && !print) {
+  if (print == false) {
+    if (flags.n == true && flags.b == false) {
+      n_option(*is_first, counter_n_option);
+    }
+    if (flags.b == true) {
+      b_option(buffer, *is_first, counter_b_option);
+    }
+    if (flags.e == true || flags.t == true) {
+      if (flags.e == true && buffer == '\n') {
+        e_option(buffer);
+      } else if (flags.t == true && buffer == '\t') {
+        t_option(&buffer);
+      } else if (flags.e == true || flags.t == true) {
+        if (buffer != '\n' && buffer != '\t') {
           v_option(buffer, &print);
+        }
       }
-      if (flags.E == true) {
-          e_option(buffer);
-      }
-      if (flags.T == true) {
-          t_option(&buffer);
-      }
+    }
+    if (flags.v == true && (flags.e == false || flags.t == false) && !print) {
+      v_option(buffer, &print);
+    }
+    if (flags.E == true) {
+      e_option(buffer);
+    }
+    if (flags.T == true) {
+      t_option(&buffer);
+    }
   }
-  if (!print){
+  if (!print) {
     putchar(buffer);
   }
   if (buffer == '\n') {
