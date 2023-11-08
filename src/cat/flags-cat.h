@@ -37,7 +37,7 @@ void b_option(char buffer, bool is_first, int *pInt);
 
 bool s_option(char *buffer, bool *is_last_empty, bool is_first);
 
-void v_option(char ch, bool *print);
+void v_option(char *ch, bool *print);
 
 void get_flags(int argc, char *argv[], struct flags_cat *flags,
                struct option *options);

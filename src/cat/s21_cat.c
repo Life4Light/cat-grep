@@ -68,12 +68,12 @@ void print_result(flags_cat flags, char buffer, int *counter_n_option,
         t_option(&buffer);
       } else if (flags.e == true || flags.t == true) {
         if (buffer != '\n' && buffer != '\t') {
-          v_option(buffer, &print);
+          v_option(&buffer, &print);
         }
       }
     }
     if (flags.v == true && (flags.e == false || flags.t == false) && !print) {
-      v_option(buffer, &print);
+      v_option(&buffer, &print);
     }
     if (flags.E == true) {
       e_option(buffer);

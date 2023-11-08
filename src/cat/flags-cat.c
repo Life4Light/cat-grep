@@ -92,14 +92,16 @@ bool s_option(char *buffer, bool *is_last_empty, bool is_first) {
   return res;
 }
 
-void v_option(char ch, bool *print) {
-  if (!isascii(ch) && !isprint(ch)) {
-    ch = toascii(ch);
+void v_option(char *ch, bool *print) {
+  if (!isascii(*ch) && !isprint(*ch)) {
+	  putchar('M');
+	  putchar('-');
+	  *ch = toascii(*ch);
   }
-  if (iscntrl(ch) && ch != '\n' && ch != '\t') {
-    putchar('^');
-    putchar(ch == 127 ? '?' : ch + 64);
-    *print = true;
+  if (iscntrl(*ch) && *ch != '\n' && *ch != '\t') {
+	  putchar('^');
+	  putchar(*ch == 127 ? '?' : *ch + 64);
+	  *print = true;
   }
 }
 
