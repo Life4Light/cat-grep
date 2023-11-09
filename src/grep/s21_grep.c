@@ -6,14 +6,14 @@ int main(int argc, char *argv[]){
     get_flags(argc, argv, &flags);
     int templates_count = flags.e;
     int templates_file_count = flags.f;
-    if(flags.e == 0){
+    if(flags.e == 0 && flags.f == 0){
         templates_count = 1;
     }
     char **templates = calloc( templates_count, sizeof(char *));
     char **templates_files = calloc(templates_file_count, sizeof(char *));
     get_f_files(argc, argv, flags, templates_files);
     get_templates(argc, argv, flags, templates);
-    int files_count = argc-optind;
+    int files_count = argc - optind;
     if(files_count == 0){
         printf("n/a");
         return 1;

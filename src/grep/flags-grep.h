@@ -24,5 +24,5 @@ void check_templates(char *templates, FILE *fp, struct flags_grep flags, char *f
 char *connect_templates(char **templates, int templates_count, char **templates_files, int templates_files_count);
 void grep(char *argv[],  struct flags_grep flags, int files_count, char *result_template);
 void get_f_files(int argc, char *argv[], struct flags_grep flags, char **files_templates);
-char **get_template_from_file(char **files, int files_count, int *in_file_templates_count);
+char *get_template_from_file(char **files, int files_count, int *templates_len);
 #endif

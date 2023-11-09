@@ -11,7 +11,7 @@ void init_flags(struct flags_grep *flags){
 
 void get_flags(int argc, char *argv[], struct flags_grep *flags){
     int opt;
-    while((opt = getopt(argc, argv, "ce:linv")) != -1){
+    while((opt = getopt(argc, argv, "ce:linvf:")) != -1){
         switch (opt) {
             case 'c':
                 flags->c = true;
@@ -43,9 +43,9 @@ void get_f_files(int argc, char *argv[], struct flags_grep flags, char **files_t
     int opt;
     flags.f = 0;
     optind = 1;
-    while((opt = getopt(argc, argv, "e:")) != -1){
+    while((opt = getopt(argc, argv, "f:")) != -1){
         switch (opt) {
-            case 'f:':
+            case 'f':
                 files_templates[flags.f] = optarg;
                 flags.f++;
                 break;
@@ -56,9 +56,9 @@ void get_f_files(int argc, char *argv[], struct flags_grep flags, char **files_t
 }
 void get_templates(int argc, char *argv[], struct flags_grep flags, char **templates){
     int opt;
-    if(flags.e == 0){
+    if(flags.e == 0 && flags.f == 0){
         templates[0] = argv[optind];
-        optind++;
+		optind++;
     }
     else {
         optind = 1;
@@ -127,66 +127,100 @@ void check_templates(char *templates, FILE *fp, struct flags_grep flags, char *f
 
 
 char *connect_templates(char **templates, int templates_count, char **templates_files, int templates_files_count){
-    size_t templates_length = 0;
-    char **result_templates_array;
-    char *result_template;
-    char **templates_from_file;
-    int templates_in_files_count = 0;
-    if(templates_files_count > 0){
-        templates_from_file = get_template_from_file(templates_files, templates_files_count, &templates_in_files_count);
+	int templates_from_file_len;
+	char *templates_from_file = NULL;
+	char *result_template;
+	size_t templates_len = 0;
+	if(templates_files_count > 0){
+		templates_from_file = get_template_from_file(templates_files, templates_files_count, &templates_from_file_len);
+	}
+	for(int i = 0; i < templates_count; i++){
+		templates_len += strlen(templates[i]);
     }
-    result_templates_array = calloc(templates_count + templates_in_files_count, sizeof(char *));
-    for(int i = 0; i < templates_count + templates_in_files_count; i++){
-        if(i < templates_count){
-            result_templates_array[i] = templates[i];
-        } else{
-            result_templates_array[i] = templates_from_file[i - templates_count];
-        }
-    }
-    templates_count += templates_in_files_count;
-    for(int i = 0; i < templates_count; i++){
-        templates_length += strlen(result_templates_array[i]);
-    }
-    result_template = calloc((templates_length + templates_count), sizeof(char));
-    strcat(result_template, result_templates_array[0]);
-    for(int i = 1; i < templates_count; i++){
-        strcat(result_template, "|");
-        strcat(result_template, result_templates_array[i]);
-    }
-    return result_template;
+	result_template = calloc((templates_len + templates_count + templates_from_file_len), sizeof(char));
+	for(int i = 0; i < templates_count; i++){
+		if(i == 0){
+			strcpy(result_template, templates[i]);
+		}else{
+			strcat(result_template, "|");
+			strcat(result_template, templates[i]);
+		}
+	}
+	if(templates_count == 0){
+		strcpy(result_template,templates_from_file);
+	} else if(templates_from_file_len > 0){
+		strcat(result_template, "|");
+		strcat(result_template,templates_from_file);
+	}
+	return result_template;
 }
 
-void grep(char *argv[],  struct flags_grep flags, int files_count, char *result_template){
+void grep(char *argv[],  struct flags_grep flags, int files_count, char *result_template) {
     char filename[256];
-    for(int i = 0; i < files_count; i++){
-        strcpy(filename, argv[optind + i]);
-        FILE *fp = fopen(filename, "r");
-        if(fp){
-            check_templates(result_template, fp, flags, filename);
-            if(i != files_count-1){
-                printf("\n");
-            }
-        } else{
-            printf("%s: No such file or directory", filename);
-        }
+    for(int current_file = 0; current_file < files_count; current_file++) {
+		if(strlen(argv[optind + current_file]) > 255){
+			printf("The file must be no more than 256 characters");
+		}else{
+			strcpy(filename, argv[optind + current_file]);
+			FILE *fp = fopen(filename, "r");
+			if(fp) {
+				check_templates(result_template, fp, flags, filename);
+				if(current_file != files_count - 1){
+					printf("\n");
+				}
+			} else {
+				printf("%s: No such file or directory", filename);
+			}
+		}
+
     }
 }
 
 
-char **get_template_from_file(char **files, int files_count, int *in_file_templates_count){
-    char *line;
-    char **templates = calloc(512, sizeof(char *));
-    int len_line;
-    for(int i = 0; i < files_count; i++){
-        FILE * fp = fopen(files[i], "r");
-        if(!fp){
-            printf("%s: No such file or directory", files[i]);
-        } else{
-            while(getline(&line, &len_line, fp) != -1) {
-                templates[*in_file_templates_count] = line;
-                (*in_file_templates_count)++;
-            }
-        }
-    }
+char *get_template_from_file(char **files, int files_count, int *templates_len) {
+	char *line = NULL;
+	char *templates;
+	int templates_count = 0;
+	size_t len_line;
+	ssize_t chars_read;
+	size_t len_templates = 0;
+	for (int i = 0; i < files_count; i++) {
+		FILE *fp = fopen(files[i], "r");
+		if (!fp) {
+			printf("%s: No such file or directory", files[i]);
+		} else {
+			while ((chars_read = getline(&line, &len_line, fp)) != -1) {
+				templates_count++;
+				len_templates += chars_read;
+				if(chars_read > 0 && line[chars_read-1] == '\n') {
+					len_templates--;
+				}
+			}
+		}
+	}
+	*templates_len = len_templates + templates_count;
+	templates = calloc(*templates_len, sizeof(char *));
+	templates_count = 0;
+	for (int i = 0; i < files_count; i++) {
+		FILE *fp = fopen(files[i], "r");
+		if(fp){
+			while ((chars_read = getline(&line, &len_line, fp)) != -1) {
+				if(chars_read > 0 && line[chars_read-1] == '\n') {
+					line[chars_read-1] = '\0';
+					// special care for windows line endings:
+					if(chars_read > 1 && line[chars_read-2] == '\r') line[chars_read-2] = '\0';
+				}
+				if(templates_count == 0){
+					strcpy(templates, line);
+				} else{
+					strcat(templates, "|");
+					strcat(templates, line);
+				}
+				templates_count++;
+			}
+			fclose(fp);
+		}
+	}
+
     return templates;
 }
