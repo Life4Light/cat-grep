@@ -19,5 +19,7 @@ struct flags_grep{
 void init_flags(struct flags_grep *flags);
 void get_flags(int argc, char *argv[], struct flags_grep *flags);
 void get_templates(int argc, char *argv[], struct flags_grep flags, char **templates);
-void check_templates(regex_t *regex_templates, int templates_count, char **templates, FILE *fp, struct flags_grep flags, char *filename);
+void check_templates(char *templates, FILE *fp, struct flags_grep flags, char *filename);
+char *connect_templates(char **templates, int templates_count);
+void grep(char *argv[],  struct flags_grep flags, int files_count, char *result_template);
 #endif

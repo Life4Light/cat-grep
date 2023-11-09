@@ -62,7 +62,7 @@ void get_templates(int argc, char *argv[], struct flags_grep flags, char **templ
 }
 
 
-void check_templates(regex_t *regex_templates, int templates_count, char **templates, FILE *fp, struct flags_grep flags, char *filename){
+void check_templates(char *templates, FILE *fp, struct flags_grep flags, char *filename){
     int settings = 0;
     int value;
     char *line = NULL;
@@ -70,24 +70,22 @@ void check_templates(regex_t *regex_templates, int templates_count, char **templ
     int number_of_line = 0;
     bool is_template_contains = false;
     size_t len_line = 0;
+    regex_t regex_templates;
     if(flags.i == true){
         settings = REG_ICASE;
     }
-    for(int i = 0; i < templates_count; i++){
-        regcomp(&regex_templates[i], templates[i], settings);
-    }
+    regcomp(&regex_templates, templates, REG_EXTENDED);
+
     while(getline(&line, &len_line, fp) != -1){
         number_of_line++;
         value = 1;
         if(flags.v){
             value = 0;
         }
-        for(int i = 0; i < templates_count; i++){
-            if(regexec(&regex_templates[i], line, 0, NULL, 0) == 0){
-                value = 0;
-                if(flags.v){
-                    value = 1;
-                }
+        if(regexec(&regex_templates, line, 0, NULL, 0) == 0){
+            value = 0;
+            if(flags.v){
+                value = 1;
             }
         }
         if(value == 0){
@@ -107,5 +105,38 @@ void check_templates(regex_t *regex_templates, int templates_count, char **templ
     }
     if(flags.c){
         printf("%d", count_of_coincidences);
+    }
+    regfree(&regex_templates);
+}
+
+
+char *connect_templates(char **templates, int templates_count){
+    size_t templates_length = 0;
+    char *result_template;
+    for(int i = 0; i < templates_count; i++){
+        templates_length += strlen(templates[i]);
+    }
+    result_template = calloc((templates_length + templates_count), sizeof(char));
+    strcat(result_template, templates[0]);
+    for(int i = 1; i < templates_count; i++){
+        strcat(result_template, "|");
+        strcat(result_template, templates[i]);
+    }
+    return result_template;
+}
+
+void grep(char *argv[],  struct flags_grep flags, int files_count, char *result_template){
+    char filename[256];
+    for(int i = 0; i < files_count; i++){
+        strcpy(filename, argv[optind + i]);
+        FILE *fp = fopen(filename, "r");
+        if(fp){
+            check_templates(result_template, fp, flags, filename);
+            if(i != files_count-1){
+                printf("\n");
+            }
+        } else{
+            printf("%s: No such file or directory", filename);
+        }
     }
 }
