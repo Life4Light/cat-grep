@@ -6,6 +6,7 @@ void init_flags(struct flags_grep *flags){
     flags->l = false;
     flags->n = false;
     flags->v = false;
+	flags->f = 0;
 }
 
 
@@ -108,20 +109,20 @@ void check_templates(char *templates, FILE *fp, struct flags_grep flags, char *f
         }
         if(value == 0){
             is_template_contains = true;
-            if(flags.n){
-                printf("%d:", number_of_line);
-            }
-            if(!flags.c && !flags.l) {
-                printf("%s", line);
-            } else{
-                count_of_coincidences++;
-            }
+			if(!flags.c && !flags.l) {
+				if(flags.n ){
+					printf("%d:", number_of_line);
+				}
+				printf("%s", line);
+			} else{
+				count_of_coincidences++;
+			}
+
         }
     }
     if(flags.l && is_template_contains){
         printf("%s", filename);
-    }
-    if(flags.c){
+    } else if(flags.c){
         printf("%d", count_of_coincidences);
     }
     regfree(&regex_templates);
@@ -129,7 +130,7 @@ void check_templates(char *templates, FILE *fp, struct flags_grep flags, char *f
 
 
 char *connect_templates(char **templates, int templates_count, char **templates_files, int templates_files_count){
-	int templates_from_file_len = 0;
+	size_t templates_from_file_len = 0;
 	char *templates_from_file = NULL;
 	char *result_template;
 	size_t templates_len = 0;
@@ -157,29 +158,7 @@ char *connect_templates(char **templates, int templates_count, char **templates_
 	return result_template;
 }
 
-void grep(char *argv[],  struct flags_grep flags, int files_count, char *result_template) {
-    char filename[256];
-    for(int current_file = 0; current_file < files_count; current_file++) {
-		if(strlen(argv[optind + current_file]) > 255){
-			printf("The file must be no more than 256 characters");
-		}else{
-			strcpy(filename, argv[optind + current_file]);
-			FILE *fp = fopen(filename, "r");
-			if(fp) {
-				check_templates(result_template, fp, flags, filename);
-				if(current_file != files_count - 1){
-					printf("\n");
-				}
-			} else {
-				printf("%s: No such file or directory", filename);
-			}
-		}
-
-    }
-}
-
-
-char *get_template_from_file(char **files, int files_count, int *templates_len) {
+char *get_template_from_file(char **files, int files_count, size_t *templates_len) {
 	char *line = NULL;
 	char *templates;
 	int templates_count = 0;
@@ -189,7 +168,7 @@ char *get_template_from_file(char **files, int files_count, int *templates_len) 
 	for (int i = 0; i < files_count; i++) {
 		FILE *fp = fopen(files[i], "r");
 		if (!fp) {
-			printf("%s: No such file or directory", files[i]);
+			printf("%s: No such file or directory\n", files[i]);
 		} else {
 			while ((chars_read = getline(&line, &len_line, fp)) != -1) {
 				templates_count++;
@@ -224,5 +203,28 @@ char *get_template_from_file(char **files, int files_count, int *templates_len) 
 		}
 	}
 
-    return templates;
+	return templates;
 }
+
+void grep(char *argv[],  struct flags_grep flags, int files_count, char *result_template) {
+    char filename[256];
+    for(int current_file = 0; current_file < files_count; current_file++) {
+		if(strlen(argv[optind + current_file]) > 255){
+			printf("The file must be no more than 256 characters");
+		}else{
+			strcpy(filename, argv[optind + current_file]);
+			FILE *fp = fopen(filename, "r");
+			if(fp) {
+				check_templates(result_template, fp, flags, filename);
+				if(current_file != files_count - 1){
+					printf("\n");
+				}
+			} else {
+				printf("%s: No such file or directory\n", filename);
+			}
+		}
+
+    }
+}
+
+
