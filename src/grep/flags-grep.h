@@ -8,7 +8,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <regex.h>
-struct flags_grep{
+typedef struct flags_grep{
     int e;
     bool i;
     bool v;
@@ -16,7 +16,7 @@ struct flags_grep{
     bool l;
     bool n;
     int f;
-};
+}flags_grep;
 void init_flags(struct flags_grep *flags);
 void get_flags(int argc, char *argv[], struct flags_grep *flags);
 void get_templates(int argc, char *argv[], struct flags_grep flags, char **templates);

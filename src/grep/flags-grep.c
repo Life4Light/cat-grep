@@ -41,18 +41,20 @@ void get_flags(int argc, char *argv[], struct flags_grep *flags){
 }
 void get_f_files(int argc, char *argv[], struct flags_grep flags, char **files_templates){
     int opt;
-    flags.f = 0;
-    optind = 1;
-    while((opt = getopt(argc, argv, "f:")) != -1){
-        switch (opt) {
-            case 'f':
-                files_templates[flags.f] = optarg;
-                flags.f++;
-                break;
-            default:
-                break;
-        }
-    }
+	if(flags.f> 0 ){
+		flags.f = 0;
+		optind = 1;
+		while((opt = getopt(argc, argv, "ce:linvf:")) != -1){
+			switch (opt) {
+				case 'f':
+					files_templates[flags.f] = optarg;
+					flags.f++;
+					break;
+				default:
+					break;
+			}
+		}
+	}
 }
 void get_templates(int argc, char *argv[], struct flags_grep flags, char **templates){
     int opt;
@@ -63,7 +65,7 @@ void get_templates(int argc, char *argv[], struct flags_grep flags, char **templ
     else {
         optind = 1;
         flags.e = 0;
-        while((opt = getopt(argc, argv, "e:")) != -1){
+        while((opt = getopt(argc, argv, "ce:linvf:")) != -1){
             switch (opt) {
                 case 'e':
                     templates[flags.e] = optarg;
@@ -127,7 +129,7 @@ void check_templates(char *templates, FILE *fp, struct flags_grep flags, char *f
 
 
 char *connect_templates(char **templates, int templates_count, char **templates_files, int templates_files_count){
-	int templates_from_file_len;
+	int templates_from_file_len = 0;
 	char *templates_from_file = NULL;
 	char *result_template;
 	size_t templates_len = 0;
