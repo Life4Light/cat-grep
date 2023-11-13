@@ -7,12 +7,14 @@ void init_flags(struct flags_grep *flags){
     flags->n = false;
     flags->v = false;
 	flags->f = 0;
+    flags->h = false;
+    flags->s = false;
 }
 
 
 void get_flags(int argc, char *argv[], struct flags_grep *flags){
     int opt;
-    while((opt = getopt(argc, argv, "ce:linvf:")) != -1){
+    while((opt = getopt(argc, argv, "ce:linvf:hs")) != -1){
         switch (opt) {
             case 'c':
                 flags->c = true;
@@ -34,6 +36,13 @@ void get_flags(int argc, char *argv[], struct flags_grep *flags){
                 break;
             case 'f':
                 flags->f +=1;
+                break;
+            case 'h':
+                flags->h = true;
+                break;
+            case 's':
+                flags->s = true;
+                break;
             default:
                 break;
 
@@ -45,7 +54,7 @@ void get_f_files(int argc, char *argv[], struct flags_grep flags, char **files_t
 	if(flags.f> 0 ){
 		flags.f = 0;
 		optind = 1;
-		while((opt = getopt(argc, argv, "ce:linvf:")) != -1){
+		while((opt = getopt(argc, argv, "ce:linvf:hs")) != -1){
 			switch (opt) {
 				case 'f':
 					files_templates[flags.f] = optarg;
@@ -66,7 +75,7 @@ void get_templates(int argc, char *argv[], struct flags_grep flags, char **templ
     else {
         optind = 1;
         flags.e = 0;
-        while((opt = getopt(argc, argv, "ce:linvf:")) != -1){
+        while((opt = getopt(argc, argv, "ce:linvf:hs")) != -1){
             switch (opt) {
                 case 'e':
                     templates[flags.e] = optarg;
@@ -110,7 +119,11 @@ void check_templates(char *templates, FILE *fp, struct flags_grep flags, char *f
         if(value == 0){
             is_template_contains = true;
 			if(!flags.c && !flags.l) {
+                if(!flags.h){
+                    printf("%s:", filename);
+                }
 				if(flags.n ){
+
 					printf("%d:", number_of_line);
 				}
 				printf("%s", line);
@@ -118,7 +131,7 @@ void check_templates(char *templates, FILE *fp, struct flags_grep flags, char *f
 				count_of_coincidences++;
 			}
 
-        }
+        };
     }
     if(flags.l && is_template_contains){
         printf("%s", filename);
@@ -134,14 +147,14 @@ char *connect_templates(char **templates, int templates_count, char **templates_
 	char *templates_from_file = NULL;
 	char *result_template;
 	size_t templates_len = 0;
-	if(templates_files_count > 0){
+	if(templates_files_count > 0) {
 		templates_from_file = get_template_from_file(templates_files, templates_files_count, &templates_from_file_len);
 	}
-	for(int i = 0; i < templates_count; i++){
+	for(int i = 0; i < templates_count; i++) {
 		templates_len += strlen(templates[i]);
     }
 	result_template = calloc((templates_len + templates_count + templates_from_file_len), sizeof(char));
-	for(int i = 0; i < templates_count; i++){
+	for(int i = 0; i < templates_count; i++) {
 		if(i == 0){
 			strcpy(result_template, templates[i]);
 		}else{
@@ -149,7 +162,7 @@ char *connect_templates(char **templates, int templates_count, char **templates_
 			strcat(result_template, templates[i]);
 		}
 	}
-	if(templates_count == 0){
+	if(templates_count == 0) {
 		strcpy(result_template,templates_from_file);
 	} else if(templates_from_file_len > 0){
 		strcat(result_template, "|");
@@ -208,6 +221,9 @@ char *get_template_from_file(char **files, int files_count, size_t *templates_le
 
 void grep(char *argv[],  struct flags_grep flags, int files_count, char *result_template) {
     char filename[256];
+    if(files_count < 2){
+        flags.h = false;
+    }
     for(int current_file = 0; current_file < files_count; current_file++) {
 		if(strlen(argv[optind + current_file]) > 255){
 			printf("The file must be no more than 256 characters");
@@ -216,10 +232,10 @@ void grep(char *argv[],  struct flags_grep flags, int files_count, char *result_
 			FILE *fp = fopen(filename, "r");
 			if(fp) {
 				check_templates(result_template, fp, flags, filename);
-				if(current_file != files_count - 1){
+				if(current_file == files_count - 1){
 					printf("\n");
 				}
-			} else {
+			} else if(flags.s == false){
 				printf("%s: No such file or directory\n", filename);
 			}
 		}

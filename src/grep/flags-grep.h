@@ -16,6 +16,8 @@ typedef struct flags_grep{
     bool l;
     bool n;
     int f;
+    bool h;
+    bool s;
 }flags_grep;
 void init_flags(struct flags_grep *flags);
 void get_flags(int argc, char *argv[], struct flags_grep *flags);

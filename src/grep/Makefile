@@ -3,7 +3,7 @@ FLAGS = -Wall -Werror -Wextra
 TARGET = main_executable_module.c
 all: s21_grep
 
-s21_grep: s21_grep.c flags-grep.c flags-grep.h
+s21_grep: s21_grep.c flags-grep.c
 	$(CC) $(FLAGS) s21_grep.c flags-grep.c -o s21_grep
 
 rebuild:
