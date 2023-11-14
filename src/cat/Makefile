@@ -1,5 +1,5 @@
 CC = /usr/bin/gcc
-FLAGS = -Wall -Werror -Wextra
+FLAGS = -std=c11 -Wall -Werror -Wextra
 TARGET = main_executable_module.c
 all: s21_cat
 

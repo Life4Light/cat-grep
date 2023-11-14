@@ -2,6 +2,9 @@
 
 #ifndef C3_SIMPLEBASHUTILS_1_FLAGS_CAT_H
 #define C3_SIMPLEBASHUTILS_1_FLAGS_CAT_H
+
+#define _GNU_SOURCE
+
 #include <ctype.h>
 #include <getopt.h>
 #include <stdbool.h>
@@ -9,7 +12,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
 #include "stdbool.h"
 
 typedef struct flags_cat {

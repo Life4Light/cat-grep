@@ -1,5 +1,5 @@
 CC = /usr/bin/gcc
-FLAGS = -Wall -Werror -Wextra
+FLAGS = -std=c11 -Wall -Werror -Wextra
 all: s21_grep
 
 s21_grep: s21_grep.c flags-grep.c
