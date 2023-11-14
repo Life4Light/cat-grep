@@ -85,6 +85,8 @@ void check_templates(char *templates, FILE *fp, struct flags_grep flags, char *f
     int settings = REG_EXTENDED;
     int value;
     char *line = NULL;
+	size_t     nmatch = 2;
+	regmatch_t pmatch[2];
     int count_of_coincidences = 0;
     int number_of_line = 0;
     bool is_template_contains = false;
@@ -101,8 +103,14 @@ void check_templates(char *templates, FILE *fp, struct flags_grep flags, char *f
         if(flags.v){
             value = 0;
         }
-        if(regexec(&regex_templates, line, 0, NULL, 0) == 0){
-            value = 0;
+        if(regexec(&regex_templates, line, nmatch, pmatch, 0) == 0){
+			while(regexec(&regex_templates, line, nmatch, pmatch, 0) == 0){
+				printf("%.*s",
+					   	pmatch[0].rm_eo - pmatch[0].rm_so, &line[pmatch[0].rm_so]);
+						line = &line[pmatch[0].rm_eo];
+						printf("\naaaaaa\n");
+			}
+			value = 0;
             if(flags.v){
                 value = 1;
             }
