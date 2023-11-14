@@ -94,14 +94,14 @@ bool s_option(char *buffer, bool *is_last_empty, bool is_first) {
 
 void v_option(char *ch, bool *print) {
   if (!isascii(*ch) && !isprint(*ch)) {
-	  putchar('M');
-	  putchar('-');
-	  *ch = toascii(*ch);
+    putchar('M');
+    putchar('-');
+    *ch = toascii(*ch);
   }
   if (iscntrl(*ch) && *ch != '\n' && *ch != '\t') {
-	  putchar('^');
-	  putchar(*ch == 127 ? '?' : *ch + 64);
-	  *print = true;
+    putchar('^');
+    putchar(*ch == 127 ? '?' : *ch + 64);
+    *print = true;
   }
 }
 
