@@ -24,9 +24,11 @@ int main(int argc, char *argv[]) {
   }
   char *result_template = connect_templates(
       templates, templates_count, templates_files, templates_file_count);
-  grep(argv, flags, files_count, result_template);
+  if(result_template){
+      grep(argv, flags, files_count, result_template);
+      free(result_template);
+  }
   free(templates);
   free(templates_files);
-  free(result_template);
 
 }

@@ -38,11 +38,11 @@ void get_f_files(int argc, char *argv[], struct flags_grep flags,
                  char **files_templates);
 char *get_template_from_file(char **files, int files_count,
                              size_t *templates_len);
-void o_option(struct flags_grep flags, regex_t regex_templates, char *filename,
-              int number_of_line);
+void o_option(struct flags_grep flags, regex_t *regex_templates, char *filename,
+              int number_of_line, char * line, bool *is_contains_template);
 void c_l_flags(flags_grep flags, bool is_template_contains, char *filename,
                int count_of_coincidences);
-void n_option(flags_grep flags, int value, bool *is_template_contains,
+void print_res(flags_grep flags, int value, bool *is_template_contains,
               char *filename, int number_of_line, char *line,
               int *count_of_coincidences);
 #endif

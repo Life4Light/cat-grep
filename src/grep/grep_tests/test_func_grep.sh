@@ -36,7 +36,7 @@ declare -a extra=(
 testing()
 {
     t=$(echo $@ | sed "s/VAR/$var/")
-    ./../s21_grep $t > test_s21_grep.log
+    valgrind --leak-check=yes ./../s21_grep  $t  2>> test_s21_grep.log
     grep $t > test_sys_grep.log
     DIFF_RES="$(diff -s test_s21_grep.log test_sys_grep.log)"
     (( COUNTER++ ))
@@ -45,10 +45,10 @@ testing()
       (( SUCCESS++ ))
       echo "\033[31m$FAIL\033[0m/\033[32m$SUCCESS\033[0m/$COUNTER \033[32msuccess\033[0m grep $t"
     else
+      echo "$DIFF_RES"
       (( FAIL++ ))
       echo "\033[31m$FAIL\033[0m/\033[32m$SUCCESS\033[0m/$COUNTER \033[31mfail\033[0m grep $t"
     fi
-    rm test_s21_grep.log test_sys_grep.log
 }
 
 # специфические тесты

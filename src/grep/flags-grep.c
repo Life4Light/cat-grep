@@ -115,19 +115,30 @@ void check_templates(char *templates, FILE *fp, struct flags_grep flags,
       value = 0;
     }
     if (regexec(&regex_templates, line, nmatch, pmatch, 0) == 0) {
-      if (flags.o && !flags.c && !flags.l && !flags.v) {
-        o_option(flags, regex_templates, filename, number_of_line);
+
+      if ((flags.o && !flags.v) || (flags.o && (flags.l || flags.c))) {
+          if(!flags.v){
+              count_of_coincidences++;
+          }
+          o_option(flags, &regex_templates, filename, number_of_line, line, &is_template_contains);
       }
       value = 0;
       if (flags.v) {
         value = 1;
       }
+    } else if( flags.o && flags.v && (flags.l || flags.c)){
+        count_of_coincidences++;
+        is_template_contains = true;
     }
-    n_option(flags, value, &is_template_contains, filename, number_of_line,
-             line, &count_of_coincidences);
+    if(!flags.o){
+        print_res(flags, value, &is_template_contains, filename, number_of_line,
+                  line, &count_of_coincidences);
+    }
   }
-  c_l_flags(flags, is_template_contains, filename, count_of_coincidences);
-  free(line);
+    c_l_flags(flags, is_template_contains, filename, count_of_coincidences);
+  if(line){
+      free(line);
+  }
   regfree(&regex_templates);
 }
 
@@ -135,7 +146,7 @@ char *connect_templates(char **templates, int templates_count,
                         char **templates_files, int templates_files_count) {
   size_t templates_from_file_len = 0;
   char *templates_from_file = NULL;
-  char *result_template;
+  char *result_template = NULL;
   size_t templates_len = 0;
   if (templates_files_count > 0) {
     templates_from_file = get_template_from_file(
@@ -144,25 +155,30 @@ char *connect_templates(char **templates, int templates_count,
   for (int i = 0; i < templates_count; i++) {
     templates_len += strlen(templates[i]);
   }
-  result_template =
-      calloc((templates_len + templates_count + templates_from_file_len),
-             sizeof(char));
-  for (int i = 0; i < templates_count; i++) {
-    if (i == 0) {
-      strcpy(result_template, templates[i]);
-    } else {
-      strcat(result_template, "|");
-      strcat(result_template, templates[i]);
-    }
+  if(templates_len + templates_count + templates_from_file_len > 0){
+      result_template =
+              calloc((templates_len + templates_count + templates_from_file_len),
+                     sizeof(char));
   }
-  if (templates_count == 0) {
-    strcpy(result_template, templates_from_file);
-  } else if (templates_from_file_len > 0) {
-    strcat(result_template, "|");
-    strcat(result_template, templates_from_file);
+  if(result_template){
+      for (int i = 0; i < templates_count; i++) {
+          if (i == 0) {
+              strcpy(result_template, templates[i]);
+          } else {
+              strcat(result_template, "|");
+              strcat(result_template, templates[i]);
+          }
+      }
+      if (templates_count == 0) {
+          strcpy(result_template, templates_from_file);
+      } else if (templates_from_file_len > 0) {
+          strcat(result_template, "|");
+          strcat(result_template, templates_from_file);
+      }
   }
-  free(templates_from_file);
-  return result_template;
+    free(templates_from_file);
+
+    return result_template;
 }
 
 char *get_template_from_file(char **files, int files_count,
@@ -186,7 +202,11 @@ char *get_template_from_file(char **files, int files_count,
         }
       }
 		fclose(fp);
-	}
+        if(line){
+            free(line);
+            line = NULL;
+        }
+    }
   }
   *templates_len = len_templates + templates_count;
   templates = calloc(*templates_len, sizeof(char *));
@@ -209,7 +229,9 @@ char *get_template_from_file(char **files, int files_count,
         }
         templates_count++;
       }
-      fclose(fp);
+        if(line){
+            free(line);
+        }      fclose(fp);
     }
   }
 
@@ -238,28 +260,34 @@ void grep(char *argv[], struct flags_grep flags, int files_count,
   }
 }
 
-void o_option(struct flags_grep flags, regex_t regex_templates, char *filename,
-              int number_of_line) {
-  char *line = NULL;
-  size_t nmatch = 2;
+void o_option(struct flags_grep flags, regex_t *regex_templates, char *filename,
+              int number_of_line, char *line, bool *is_contains_template) {
+    size_t nmatch = 2;
   regmatch_t pmatch[2];
-  while (regexec(&regex_templates, line, nmatch, pmatch, 0) == 0) {
-    if (!flags.h) {
-      printf("%s:", filename);
-    }
-    if (flags.n) {
-      printf("%d:", number_of_line);
-    }
-    printf("%.*s\n", pmatch[0].rm_eo - pmatch[0].rm_so, &line[pmatch[0].rm_so]);
+    while ( regexec(regex_templates, line, nmatch, pmatch, 0) == 0) {
+        *is_contains_template = true;
+      if(!flags.l && !flags.c){
+          if (!flags.h) {
+              printf("%s:", filename);
+          }
+          if (flags.n) {
+              printf("%d:", number_of_line);
+          }
+          printf("%.*s\n", pmatch[0].rm_eo - pmatch[0].rm_so, &line[pmatch[0].rm_so]);
+      }
+
     line = &line[pmatch[0].rm_eo];
   }
+    if(flags.v ){
+        *is_contains_template = !(*is_contains_template);
+    }
 }
 
 void c_l_flags(flags_grep flags, bool is_template_contains, char *filename,
                int count_of_coincidences) {
-  if (flags.l && is_template_contains && !flags.o) {
+  if (flags.l && is_template_contains) {
     printf("%s\n", filename);
-  } else if (flags.c && !flags.o) {
+  } else if (flags.c) {
     if (!(flags.c && flags.l && count_of_coincidences == 0)) {
       if (!flags.h) {
         printf("%s:", filename);
@@ -269,10 +297,10 @@ void c_l_flags(flags_grep flags, bool is_template_contains, char *filename,
   }
 }
 
-void n_option(flags_grep flags, int value, bool *is_template_contains,
+void print_res(flags_grep flags, int value, bool *is_template_contains,
               char *filename, int number_of_line, char *line,
               int *count_of_coincidences) {
-  if (value == 0 && !flags.o) {
+  if (value == 0) {
     *is_template_contains = true;
     if (!flags.c && !flags.l) {
       if (!flags.h) {
@@ -281,7 +309,12 @@ void n_option(flags_grep flags, int value, bool *is_template_contains,
       if (flags.n) {
         printf("%d:", number_of_line);
       }
-      printf("%s", line);
+      if(line[strlen(line)-1] == '\n'){
+          printf("%s", line);
+      } else{
+          printf("%s\n", line);
+      }
+
     } else {
       (*count_of_coincidences)++;
     }
