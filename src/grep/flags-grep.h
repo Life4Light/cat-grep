@@ -39,10 +39,18 @@ void get_f_files(int argc, char *argv[], struct flags_grep flags,
 char *get_template_from_file(char **files, int files_count,
                              size_t *templates_len);
 void o_option(struct flags_grep flags, regex_t *regex_templates, char *filename,
-              int number_of_line, char * line, bool *is_contains_template);
+              int number_of_line, char *line, bool *is_contains_template);
 void c_l_flags(flags_grep flags, bool is_template_contains, char *filename,
                int count_of_coincidences);
 void print_res(flags_grep flags, int value, bool *is_template_contains,
-              char *filename, int number_of_line, char *line,
-              int *count_of_coincidences);
+               char *filename, int number_of_line, char *line,
+               int *count_of_coincidences);
+void change_eof(ssize_t chars_read, char *line);
+void connect_templates_from_file(FILE *fp, int templates_count,
+                                 char *templates);
+void check_string_from_pattern(struct flags_grep flags, FILE *fp,
+                               regex_t regex_templates, char *filename,
+                               bool *is_template_contains,
+                               int *count_of_coincidences);
+void v_option(struct flags_grep flags, int *count_of_coincidences);
 #endif
