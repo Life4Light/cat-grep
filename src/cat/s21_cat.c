@@ -29,7 +29,7 @@ void cat(int files_count, char *argv[], struct flags_cat flags) {
     strcpy(file_name, argv[optind + i]);
     FILE *fp = fopen(file_name, "r");
     if (!fp) {
-      printf("%s is not correct\n", file_name);
+      fprintf((stderr), "%s is not correct\n", file_name);
       continue;
     }
     if (i != 0) {
