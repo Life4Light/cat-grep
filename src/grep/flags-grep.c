@@ -223,7 +223,7 @@ void o_option(struct flags_grep flags, regex_t *regex_templates, char *filename,
       if (flags.n) {
         printf("%d:", number_of_line);
       }
-      printf("%.*s\n", pmatch[0].rm_eo - pmatch[0].rm_so,
+      printf("%.*s\n", (int)(pmatch[0].rm_eo - pmatch[0].rm_so),
              &line[pmatch[0].rm_so]);
     }
 
